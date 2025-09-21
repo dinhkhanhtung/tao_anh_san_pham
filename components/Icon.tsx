@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 type IconProps = {
@@ -28,4 +27,21 @@ export const IconSparkles: React.FC<IconProps> = ({ className }) => (
       <path d="M12 2c-.3 0-.5.2-.5.5v2c0 .3.2.5.5.5s.5-.2.5-.5v-2c0-.3-.2-.5-.5-.5Zm0 17c-.3 0-.5.2-.5.5v2c0 .3.2.5.5.5s.5-.2.5-.5v-2c0-.3-.2-.5-.5-.5ZM20.4 4.1c-.2-.2-.5-.2-.7 0l-1.4 1.4c-.2.2-.2.5 0 .7.1.1.3.2.5.2s.4-.1.5-.2l1.4-1.4c.2-.2.2-.5 0-.7ZM6.1 18.9c-.2-.2-.5-.2-.7 0l-1.4 1.4c-.2.2-.2.5 0 .7.1.1.3.2.5.2s.4-.1.5-.2l1.4-1.4c.2-.2.2-.5 0-.7ZM22 11.5c0-.3-.2-.5-.5-.5h-2c-.3 0-.5.2-.5.5s.2.5.5.5h2c.3 0 .5-.2.5-.5ZM4 11.5c0-.3-.2-.5-.5-.5h-2c-.3 0-.5.2-.5.5s.2.5.5.5h2c.3 0 .5-.2.5-.5ZM18.9 6.1c.2-.2.2-.5 0-.7l-1.4-1.4c-.2-.2-.5-.2-.7 0s-.2.5 0 .7l1.4 1.4c.1.1.3.2.5.2s.4-.1.5-.2ZM4.1 20.4c.2-.2.2-.5 0-.7l-1.4-1.4c-.2-.2-.5-.2-.7 0s-.2.5 0 .7l1.4 1.4c.1.1.3.2.5.2s.4-.1.5-.2ZM12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/>
     </svg>
 );
-   
+
+export const IconTrash: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+    </svg>
+);
+
+export const IconPlus: React.FC<IconProps> = ({ className }) => (
+  <svg className={className} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 1v16M1 9h16"/>
+  </svg>
+);
+
+export const IconCheckCircle: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m7 10 2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+    </svg>
+);

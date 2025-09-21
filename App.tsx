@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 import { Spinner } from './components/Spinner';
@@ -8,16 +7,75 @@ import { DEFAULT_PROMPT } from './constants';
 import { IconPhoto, IconSparkles } from './components/Icon';
 
 const App: React.FC = () => {
-  const [characterImage, setCharacterImage] = useState<FileInfo | null>(null);
-  const [productImage, setProductImage] = useState<FileInfo | null>(null);
+  const [characterImages, setCharacterImages] = useState<FileInfo[]>([]);
+  const [productImages, setProductImages] = useState<FileInfo[]>([]);
+  const [selectedCharacterImage, setSelectedCharacterImage] = useState<FileInfo | null>(null);
+  const [selectedProductImage, setSelectedProductImage] = useState<FileInfo | null>(null);
+
   const [customPrompt, setCustomPrompt] = useState<string>('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleImageUpdate = useCallback((
+    setImages: React.Dispatch<React.SetStateAction<FileInfo[]>>,
+    setSelectedImage: React.Dispatch<React.SetStateAction<FileInfo | null>>,
+    currentSelectedImage: FileInfo | null
+  ) => (updatedFiles: FileInfo[]) => {
+      setImages(prevImages => {
+        const newImages = [...prevImages];
+        let selectionUpdated = false;
+
+        updatedFiles.forEach(updatedFile => {
+          const existingIndex = newImages.findIndex(img => img.id === updatedFile.id);
+          if (existingIndex > -1) {
+            newImages[existingIndex] = { ...newImages[existingIndex], ...updatedFile };
+          } else {
+            newImages.push(updatedFile);
+          }
+
+          if (updatedFile.status === 'success' && !selectionUpdated && !currentSelectedImage) {
+             setSelectedImage(updatedFile);
+             selectionUpdated = true;
+          }
+
+          if (updatedFile.status === 'success') {
+            setTimeout(() => {
+              setImages(current => current.map(img =>
+                img.id === updatedFile.id ? { ...img, status: undefined, progress: undefined } : img
+              ));
+            }, 2000);
+          }
+        });
+        return newImages;
+      });
+  }, []);
+
+  const handleCharacterImageUpdate = handleImageUpdate(setCharacterImages, setSelectedCharacterImage, selectedCharacterImage);
+  const handleProductImageUpdate = handleImageUpdate(setProductImages, setSelectedProductImage, selectedProductImage);
+
+
+  const handleCharacterImageDelete = useCallback((fileId: string) => {
+    const newImageList = characterImages.filter(img => img.id !== fileId);
+    setCharacterImages(newImageList);
+    if (selectedCharacterImage?.id === fileId) {
+      setSelectedCharacterImage(newImageList.length > 0 ? newImageList[0] : null);
+    }
+  }, [characterImages, selectedCharacterImage]);
+
+
+  const handleProductImageDelete = useCallback((fileId: string) => {
+    const newImageList = productImages.filter(img => img.id !== fileId);
+    setProductImages(newImageList);
+    if (selectedProductImage?.id === fileId) {
+      setSelectedProductImage(newImageList.length > 0 ? newImageList[0] : null);
+    }
+  }, [productImages, selectedProductImage]);
+
+
   const handleGeneration = useCallback(async () => {
-    if (!characterImage || !productImage) {
-      setError('Vui lòng tải lên cả hai hình ảnh nhân vật và sản phẩm.');
+    if (!selectedCharacterImage || !selectedProductImage) {
+      setError('Vui lòng chọn một ảnh nhân vật và một ảnh sản phẩm.');
       return;
     }
 
@@ -28,7 +86,7 @@ const App: React.FC = () => {
     const promptToUse = customPrompt.trim() === '' ? DEFAULT_PROMPT : customPrompt;
 
     try {
-      const resultBase64 = await generateImageWithRetry(characterImage, productImage, promptToUse);
+      const resultBase64 = await generateImageWithRetry(selectedCharacterImage, selectedProductImage, promptToUse);
       setGeneratedImage(`data:image/png;base64,${resultBase64}`);
     } catch (err) {
       console.error(err);
@@ -36,9 +94,9 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [characterImage, productImage, customPrompt]);
+  }, [selectedCharacterImage, selectedProductImage, customPrompt]);
 
-  const canGenerate = characterImage !== null && productImage !== null && !isLoading;
+  const canGenerate = selectedCharacterImage !== null && selectedProductImage !== null && !isLoading;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 sm:p-6 lg:p-8 font-sans">
@@ -55,17 +113,23 @@ const App: React.FC = () => {
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="flex flex-col gap-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">1. Tải lên hình ảnh</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">1. Tải lên & Chọn ảnh</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ImageUploader
                   title="Ảnh nhân vật"
-                  onImageUpload={setCharacterImage}
-                  fileInfo={characterImage}
+                  onImagesUpdate={handleCharacterImageUpdate}
+                  onImageSelect={setSelectedCharacterImage}
+                  onImageDelete={handleCharacterImageDelete}
+                  files={characterImages}
+                  selectedFile={selectedCharacterImage}
                 />
                 <ImageUploader
                   title="Ảnh sản phẩm"
-                  onImageUpload={setProductImage}
-                  fileInfo={productImage}
+                  onImagesUpdate={handleProductImageUpdate}
+                  onImageSelect={setSelectedProductImage}
+                  onImageDelete={handleProductImageDelete}
+                  files={productImages}
+                  selectedFile={selectedProductImage}
                 />
               </div>
             </div>
@@ -102,7 +166,7 @@ const App: React.FC = () => {
               {isLoading && <Spinner size="lg" />}
               {error && <div className="text-red-500 p-4 text-center">{error}</div>}
               {generatedImage && !isLoading && !error && (
-                <img src={generatedImage} alt="Generated result" className="w-full h-full object-contain" />
+                <img src={generatedImage} alt="Generated result" className="w-full h-full object-contain animate-scale-in" />
               )}
               {!isLoading && !error && !generatedImage && (
                 <div className="text-center text-gray-500 dark:text-gray-400 p-4">
@@ -119,4 +183,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-   
