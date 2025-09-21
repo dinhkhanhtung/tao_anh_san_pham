@@ -1,0 +1,3 @@
+
+export const DEFAULT_PROMPT = `Tạo một hình ảnh chân thực, độ phân giải cao, phù hợp cho bài đăng trên mạng xã hội hoặc banner website. Nhân vật từ ảnh thứ nhất đang sử dụng hoặc tương tác với sản phẩm từ ảnh thứ hai. Cảnh được chụp từ góc máy chuyên nghiệp, tập trung làm nổi bật nhân vật và sản phẩm. Sử dụng ánh sáng mềm mại, tự nhiên để làm nổi bật chi tiết. Đặt nhân vật trong một bối cảnh hấp dẫn có liên quan đến sản phẩm (ví dụ: một quán cà phê ấm cúng cho sản phẩm thời trang, một không gian làm việc hiện đại cho thiết bị điện tử). Đảm bảo sự kết hợp giữa nhân vật và sản phẩm trông tự nhiên và liền mạch.`;
+   
